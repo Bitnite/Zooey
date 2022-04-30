@@ -14,7 +14,7 @@ const (
 	BOOLEAN = "BOOL"
 
 	// Operators
-	ASSIGN   = ":=:"
+	ASSIGN   = "ASSIGN"
 	PLUS     = "+"
 	MINUS    = "-"
 	BANG     = "!"
@@ -30,7 +30,7 @@ const (
 	NOT_EQ = "!="
 
 	// Delimitadores
-	COMMA     = "." // implementar dps
+	DOT       = "." // implementar dps
 	SEMICOLON = ";"
 	COLON     = ":"
 
@@ -61,8 +61,7 @@ type Token struct {
 }
 
 var keywords = map[string]TokenType{
-
-	"OwO":    OwO,
+	"owo":    OwO,
 	"fn":     FN,
 	"true":   TRUE,
 	"false":  FALSE,
