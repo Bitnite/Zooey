@@ -9,6 +9,7 @@ import (
 
 func TestLexer_NextToken(t *testing.T) {
 	type test struct {
+		name    string
 		input   string
 		want    []Token.Token
 		wantErr bool
@@ -16,6 +17,7 @@ func TestLexer_NextToken(t *testing.T) {
 
 	tests := []test{
 		{
+			name:  "should tokenize simple expression correctly",
 			input: "owo teste :=: 5;",
 			want: []Token.Token{
 				{Type: Token.OwO, Literal: "owo"},
@@ -27,6 +29,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize if GT expression correctly",
 			input: "if 5 > 2 { return true }",
 			want: []Token.Token{
 				{Type: Token.IF, Literal: "if"},
@@ -41,6 +44,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize if EQ expression correctly",
 			input: "if 2 == 2 { return true }",
 			want: []Token.Token{
 				{Type: Token.IF, Literal: "if"},
@@ -55,6 +59,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize if NOT_EQ expression correctly",
 			input: "if 5 != 2 { return true }",
 			want: []Token.Token{
 				{Type: Token.IF, Literal: "if"},
@@ -69,6 +74,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize float value correctly",
 			input: "owo myFloat :=: 5.25",
 			want: []Token.Token{
 				{Type: Token.OwO, Literal: "owo"},
@@ -79,6 +85,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize integer values correctly",
 			input: "owo myInt :=: 5",
 			want: []Token.Token{
 				{Type: Token.OwO, Literal: "owo"},
@@ -89,6 +96,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "should tokenize all tokens correctly",
 			input: `owo x 5 "xx" 10.25 true false :=: + - ! * / > < >= <= == != ; : fn && for while`,
 			want: []Token.Token{
 				{Type: Token.OwO, Literal: "owo"},
@@ -120,6 +128,7 @@ func TestLexer_NextToken(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:  "inexistent token should be illegal",
 			input: ":=",
 			want: []Token.Token{
 				{Type: Token.ILLEGAL, Literal: "="},
@@ -129,23 +138,25 @@ func TestLexer_NextToken(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		l := NewLexer(tc.input)
+		t.Run(tc.name, func(t *testing.T) {
+			l := NewLexer(tc.input)
 
-		var tokenEOF Token.Token
-		tokenEOF.Type = Token.EOF
-		tokenEOF.Literal = ""
+			var tokenEOF Token.Token
+			tokenEOF.Type = Token.EOF
+			tokenEOF.Literal = ""
 
-		tokenList := []Token.Token{}
+			tokenList := []Token.Token{}
 
-		for {
-			tok := l.NextToken()
+			for {
+				tok := l.NextToken()
 
-			if tok == tokenEOF {
-				break
+				if tok == tokenEOF {
+					break
+				}
+				tokenList = append(tokenList, tok)
 			}
-			tokenList = append(tokenList, tok)
-		}
 
-		assert.Equal(t, tc.want, tokenList, "The two words should be the same.")
+			assert.Equal(t, tc.want, tokenList, "The tokenList must be equal!")
+		})
 	}
 }
