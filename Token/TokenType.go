@@ -1,6 +1,6 @@
-package Token
+package token
 
-type TokenType string
+type Type string
 
 const (
 	ILLEGAL = "ILLEGAL"
@@ -25,6 +25,7 @@ const (
 	GT  = ">"
 	LTE = "<="
 	GTE = ">="
+	POW = "^"
 
 	EQ     = "=="
 	NOT_EQ = "!="
@@ -33,6 +34,7 @@ const (
 	DOT       = "." // implementar dps
 	SEMICOLON = ";"
 	COLON     = ":"
+	COMMA     = ","
 
 	LPAREN   = "("
 	RPAREN   = ")"
@@ -56,11 +58,11 @@ const (
 )
 
 type Token struct {
-	Type    TokenType
+	Type    Type
 	Literal string
 }
 
-var keywords = map[string]TokenType{
+var keywords = map[string]Type{
 	"owo":    OwO,
 	"fn":     FN,
 	"true":   TRUE,
@@ -72,7 +74,7 @@ var keywords = map[string]TokenType{
 	"for":    FOR,
 }
 
-func LookupIdent(identifier string) TokenType {
+func LookupIdent(identifier string) Type {
 	if tok, ok := keywords[identifier]; ok {
 		return tok
 	} else {
