@@ -31,6 +31,7 @@ var precedences = map[token.Type]int{
 	token.GTE:      LESSGREATER,
 	token.LTE:      LESSGREATER,
 	token.PLUS:     SUM,
+	token.PLUSPLUS: SUM,
 	token.MINUS:    SUM,
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
@@ -83,6 +84,7 @@ func New(lexer *Lexer.Lexer) *Parser {
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 	p.registerInfix(token.POW, p.parseInfixExpression)
+	p.registerInfix(token.PLUSPLUS, p.parseInfixExpression)
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -109,6 +111,24 @@ func (p *Parser) parseIdentifier() ast.Expression {
 		p.nextToken()
 
 		binder.Value = p.parseExpression(LOWEST)
+
+		return binder
+
+	} else if p.peekTokenIs(token.PLUSPLUS) {
+		// ex: i++
+		ident := p.currentToken
+		binder := &ast.BindExpression{Token: p.currentToken, Left: p.currentToken.Literal}
+
+		p.nextToken()
+		// Parse the expression without recursion
+		binder.Value = &ast.InfixExpression{
+			Token: p.currentToken, // ++
+			Left: &ast.Identifier{
+				Token: ident, // the previous identifier
+				Value: ident.Literal,
+			},
+			Operator: p.currentToken.Literal, Right: nil,
+		}
 
 		return binder
 	}
@@ -282,7 +302,6 @@ func (p *Parser) ParseExpressionStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	// Acha uma função (prefix) que se encaixa com o token atual
 	prefix := p.prefixParseFns[p.currentToken.Type]
 
 	if prefix == nil {
@@ -290,13 +309,8 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		return nil
 	}
 
-	// Executa a função antes capturada, a funçao mais à esquerda
 	leftexp := prefix()
 
-	// Função recursiva -> aonde pegamos o infix que é sempre a função do proximo token
-	// Avançamos um token
-	// Jogamos na função do proximo token, a funçao mais à esquerda (salvando ela na "AST")
-	// Para então no final formarmos uma expressão completa
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		infix := p.infixParseFns[p.peekToken.Type]
 
@@ -319,8 +333,6 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 
 	p.nextToken()
 
-	// O valor "PREFIX" indica o nivel de precedencia, que é quase o maior possivel
-	// Fazendo com que dessa forma ele retorne sem entrar no loop recursivo
 	expression.Right = p.parseExpression(PREFIX)
 
 	return expression
@@ -360,7 +372,6 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	p.nextToken()
 
-	// Parseia o que está entre parenteses
 	expression.Condition = p.parseExpression(LOWEST)
 
 	// Espera o inicio do {
@@ -443,9 +454,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 
 	// Se o proximo token for uma vigula
 	for p.peekTokenIs(token.COMMA) {
-		// Pula valor anterior
 		p.nextToken()
-		// Pula virgula
 		p.nextToken()
 		ident := &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
 		identifiers = append(identifiers, ident)
@@ -460,7 +469,6 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 }
 
 // Captura a call, preenchendo seus argumentos
-// callsFunction(2,3,fn(x,y){x+y;});
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
@@ -485,7 +493,6 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 	hash := &ast.HashLiteral{Token: p.currentToken}
 	hash.Pairs = make(map[ast.Expression]ast.Expression)
 
-	// Enquanto não achar o final do } do hash
 	for !p.peekTokenIs(token.RBRACE) {
 		p.nextToken()
 		key := p.parseExpression(LOWEST)

@@ -54,7 +54,13 @@ func (lexer *Lexer) NextToken() token.Token {
 	case '.':
 		tok = newToken(token.DOT, lexer.ch)
 	case '+':
-		tok = newToken(token.PLUS, lexer.ch)
+		if lexer.peekChar() == '+' {
+			ch := lexer.ch
+			lexer.readChar()
+			tok = token.Token{Type: token.PLUSPLUS, Literal: string(ch) + string(lexer.ch)}
+		} else {
+			tok = newToken(token.PLUS, lexer.ch)
+		}
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = lexer.readString()
@@ -200,7 +206,7 @@ func isLetter(ch byte) bool {
 
 func (lexer *Lexer) readIdentifier() string {
 	firstPosition := lexer.curChar
-
+	// a .. b
 	for isLetter(lexer.ch) {
 		lexer.readChar()
 	}

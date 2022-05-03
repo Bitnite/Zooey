@@ -7,7 +7,7 @@ func NewEnvironment() *Environment {
 
 type Environment struct {
 	store map[string]Object
-	outer *Environment // Extentendendo o environment
+	outer *Environment // Extendendo o environment
 }
 
 func (e *Environment) Get(name string) (Object, bool) {

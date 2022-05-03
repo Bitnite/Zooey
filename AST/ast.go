@@ -37,7 +37,6 @@ type ReturnStatement struct {
 	ReturnValue Expression
 }
 
-// DONT STOP TILL GET ENOUGH.... TATANANANANANANA
 type Identifier struct {
 	Token token.Token
 	Value string

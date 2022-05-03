@@ -10,7 +10,11 @@ import (
 )
 
 func main() {
-	l := Lexer.NewLexer(`owo x :=: 0; for ( owo i :=: 0; i <= 100; i :=: i + 1) { x :=: x + 10; x}`)
+	l := Lexer.NewLexer(`owo zap :=: 5; 
+		for(owo i :=: 0; i < 10; i++){
+			zap :=: zap + 1
+		}; zap`)
+
 	parser := parser.New(l)
 	program := parser.ParseProgram()
 
