@@ -60,7 +60,7 @@ type (
 func New(lexer *Lexer.Lexer) *Parser {
 	p := &Parser{l: lexer, errors: []string{}}
 
-	// Registro de cada função que deve ser chamada ao encontrar determinado "prefix"
+	// Assign an specific func based on the token it represents
 	p.prefixParseFns = make(map[token.Type]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
@@ -78,7 +78,7 @@ func New(lexer *Lexer.Lexer) *Parser {
 	p.registerPrefix(token.WHILE, p.parseWhileExpression)
 	p.registerPrefix(token.FOR, p.parseForExpression)
 
-	// Registro de cada função que deve ser chamada ao encontrar determinado "infix"
+	// Assign a infixExpression func to each token
 	p.infixParseFns = make(map[token.Type]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
@@ -95,8 +95,9 @@ func New(lexer *Lexer.Lexer) *Parser {
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
-	// Duas vezes para termos valores tanto no curToken como no peekToken
+	// set the value in the current token
 	p.nextToken()
+	// set the value in the next token
 	p.nextToken()
 
 	return p
@@ -242,27 +243,21 @@ func (p *Parser) ParseStatement() ast.Statement {
 	}
 }
 
-// Constroi um statement a partir do MoonvarStatement e faz asserções sobre
-// como um MoonvarStatement deveria se comportar ->  ex: "moonvar x = 5"
 func (p *Parser) ParseOwOStatement() *ast.OwOStatement {
 	statement := &ast.OwOStatement{Token: p.currentToken}
 
-	// Espera que o proximo token seja um identifier, ou seja, o nome da variavel
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
-	// Guarda o nome do statement como o "nome" da variavel ex: "moonvar x = 1" -> guardamos o x
 	statement.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
 
-	// Espera que o proximo token seja um "="
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 
 	p.nextToken()
 
-	// Avalia a proxima expressão, após o sinal de =
 	statement.Value = p.parseExpression(LOWEST)
 
 	for p.peekTokenIs(token.SEMICOLON) {
@@ -272,13 +267,11 @@ func (p *Parser) ParseOwOStatement() *ast.OwOStatement {
 	return statement
 }
 
-// Constroi um statement a partir do returnStatement e faz asserções sobre
 func (p *Parser) ParseReturnStatement() *ast.ReturnStatement {
 	statement := &ast.ReturnStatement{Token: p.currentToken}
 
 	p.nextToken()
 
-	// Return (expression) -> Essa expression que estamos parseando aqui
 	statement.ReturnValue = p.parseExpression(LOWEST)
 
 	for p.peekTokenIs(token.SEMICOLON) {
@@ -291,7 +284,7 @@ func (p *Parser) ParseReturnStatement() *ast.ReturnStatement {
 func (p *Parser) ParseExpressionStatement() *ast.ExpressionStatement {
 	statement := &ast.ExpressionStatement{Token: p.currentToken}
 
-	// Vemos o inicio do algoritmo de Vaughan Pratt aqui
+	// Start of the Vaughan Pratt algorithm
 	statement.Expression = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
@@ -347,15 +340,12 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 
 	precedence := p.currPrecedence()
 	p.nextToken()
-	// Recursividade -> chama a parseExpression sempre com um token a frente da precedencia
-	// e desse forma gera um loop que guarda as expressões de 2 em 2 até encontrar token.SEMICOLON
+	// builds the right side of the expression tree
 	expression.Right = p.parseExpression(precedence)
 
 	return expression
 }
 
-// Grouped expressions baseiam se nos parenteses, cada parenteses podem apenas ter 2 elementos
-// Porém isso pode ocorrer (2 / (5 + 5)), dois no parenteses mais a dentro, e no de fora... também dois, infix(infix(2), infix(5,5))
 func (p *Parser) parseGroupedExpression() ast.Expression {
 	p.nextToken()
 
@@ -468,13 +458,14 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	return identifiers
 }
 
-// Captura a call, preenchendo seus argumentos
+// Call of a function like "doSomething()""
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
 	return exp
 }
 
+// Ex: list = [1,2,3] -> list[2]
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	exp := &ast.IndexExpression{Token: p.currentToken, Left: left}
 
@@ -497,7 +488,6 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 		p.nextToken()
 		key := p.parseExpression(LOWEST)
 
-		// Separação : do hash
 		if !p.expectPeek(token.COLON) {
 			return nil
 		}
@@ -517,7 +507,6 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 
 }
 
-// Transforma um string (que tem valor inteiro) em inteiro.
 func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit := &ast.LiteralInteger{Token: p.currentToken}
 

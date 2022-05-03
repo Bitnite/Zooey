@@ -46,12 +46,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
-	case *ast.OwOExpression:
-		var result []object.Object
+	/*case *ast.OwOExpression:
+	var result []object.Object
 
-		owoExp := EvalOwOExpression(node.Expressions, &result, env)
+	owoExp := EvalOwOExpression(node.Expressions, &result, env)
 
-		return (*owoExp)[0]
+	return (*owoExp)[0]*/
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue, env)
 		if isError(val) {
@@ -158,6 +158,7 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	}
 }
 
+/* OLD AND UNSTABLE FEATURE: FIX ME
 func EvalOwOExpression(expressions []ast.Expression, result *[]object.Object, env *object.Environment) *[]object.Object {
 	var myVar []ast.Expression
 	// Get the first entry value
@@ -212,7 +213,7 @@ func EvalOwOExpression(expressions []ast.Expression, result *[]object.Object, en
 	}
 
 	return result
-}
+}*/
 
 func evalBangOperatorExpression(right object.Object) object.Object {
 	switch right {

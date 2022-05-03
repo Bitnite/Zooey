@@ -7,10 +7,10 @@ const (
 	EOF     = "EOF"
 
 	// Identificadores + Literais
-	IDENT   = "IDENT" // int -> x <- = 5
-	INT     = "INT"   // 123456789 ...
+	IDENT   = "IDENT"
+	INT     = "INT"
 	STRING  = "STRING"
-	FLOAT   = "FLOAT" // Implementar dps
+	FLOAT   = "FLOAT"
 	BOOLEAN = "BOOL"
 
 	// Operators
@@ -33,7 +33,7 @@ const (
 	NOT_EQ = "!="
 
 	// Delimitadores
-	DOT       = "." // implementar dps
+	DOT       = "."
 	SEMICOLON = ";"
 	COLON     = ":"
 	COMMA     = ","
@@ -46,8 +46,8 @@ const (
 	RBRACKET = "]"
 
 	// Keywords
-	FN     = "FN"  //Function
-	OwO    = "OwO" //let -> pensar em nome melhor
+	FN     = "FN"
+	OwO    = "OwO"
 	TRUE   = "TRUE"
 	FALSE  = "FALSE"
 	IF     = "IF"
@@ -56,7 +56,7 @@ const (
 	WHILE  = "WHILE"
 	AND    = "&&"
 	OR     = "||"
-	FOR    = "FOR" //implementar dps
+	FOR    = "FOR"
 )
 
 type Token struct {
