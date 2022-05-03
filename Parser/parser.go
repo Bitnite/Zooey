@@ -24,20 +24,20 @@ const (
 )
 
 var precedences = map[token.Type]int{
-	token.EQ:       EQUALS,
-	token.NOT_EQ:   EQUALS,
-	token.LT:       LESSGREATER,
-	token.GT:       LESSGREATER,
-	token.GTE:      LESSGREATER,
-	token.LTE:      LESSGREATER,
-	token.PLUS:     SUM,
-	token.PLUSPLUS: SUM,
-	token.MINUS:    SUM,
-	token.SLASH:    PRODUCT,
-	token.ASTERISK: PRODUCT,
-	token.POW:      POTENTIATION,
-	token.LBRACKET: INDEX,
-	token.LPAREN:   CALL,
+	token.EQ:         EQUALS,
+	token.NOT_EQ:     EQUALS,
+	token.LT:         LESSGREATER,
+	token.GT:         LESSGREATER,
+	token.GTE:        LESSGREATER,
+	token.LTE:        LESSGREATER,
+	token.PLUS:       SUM,
+	token.MINUSMINUS: SUM,
+	token.MINUS:      SUM,
+	token.SLASH:      PRODUCT,
+	token.ASTERISK:   PRODUCT,
+	token.POW:        POTENTIATION,
+	token.LBRACKET:   INDEX,
+	token.LPAREN:     CALL,
 }
 
 type Parser struct {
@@ -84,7 +84,7 @@ func New(lexer *Lexer.Lexer) *Parser {
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
 	p.registerInfix(token.POW, p.parseInfixExpression)
-	p.registerInfix(token.PLUSPLUS, p.parseInfixExpression)
+	p.registerInfix(token.MINUSMINUS, p.parseInfixExpression)
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
 	p.registerInfix(token.EQ, p.parseInfixExpression)
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
@@ -114,7 +114,7 @@ func (p *Parser) parseIdentifier() ast.Expression {
 
 		return binder
 
-	} else if p.peekTokenIs(token.PLUSPLUS) {
+	} else if p.peekTokenIs(token.PLUSPLUS) || p.peekTokenIs(token.MINUSMINUS) {
 		// ex: i++
 		ident := p.currentToken
 		binder := &ast.BindExpression{Token: p.currentToken, Left: p.currentToken.Literal}

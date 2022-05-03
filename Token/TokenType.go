@@ -14,13 +14,14 @@ const (
 	BOOLEAN = "BOOL"
 
 	// Operators
-	ASSIGN   = "ASSIGN"
-	PLUS     = "+"
-	PLUSPLUS = "++"
-	MINUS    = "-"
-	BANG     = "!"
-	ASTERISK = "*"
-	SLASH    = "/"
+	ASSIGN     = "ASSIGN"
+	PLUS       = "+"
+	PLUSPLUS   = "++"
+	MINUSMINUS = "--"
+	MINUS      = "-"
+	BANG       = "!"
+	ASTERISK   = "*"
+	SLASH      = "/"
 
 	LT  = "<"
 	GT  = ">"

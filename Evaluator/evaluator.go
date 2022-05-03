@@ -238,8 +238,8 @@ func evalMinusOperatorExpression(right object.Object) object.Object {
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
 	switch {
-	case left.Type() == object.INTEGER_OBJ && right == nil && operator == "++":
-		return evalPlusPlusExpression(operator, left)
+	case left.Type() == object.INTEGER_OBJ && right == nil && operator == "++" || operator == "--":
+		return evalPostfixExpression(operator, left)
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
 		return evalIntegerInfixExpression(operator, left, right)
 	case left.Type() == object.FLOAT && right.Type() == object.FLOAT:
@@ -300,13 +300,14 @@ func evalIntegerInfixExpression(operator string, left object.Object, right objec
 	}
 }
 
-func evalPlusPlusExpression(operator string, left object.Object) object.Object {
+func evalPostfixExpression(operator string, left object.Object) object.Object {
 	leftVal := left.(*object.Integer).Value
 
 	switch operator {
-	// Non-bool
-	case "++": // fix me
+	case "++":
 		return &object.Integer{Value: leftVal + 1}
+	case "--":
+		return &object.Integer{Value: leftVal - 1}
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, nil)
 	}

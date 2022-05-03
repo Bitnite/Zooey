@@ -67,7 +67,13 @@ func (lexer *Lexer) NextToken() token.Token {
 	case '^':
 		tok = newToken(token.POW, lexer.ch)
 	case '-':
-		tok = newToken(token.MINUS, lexer.ch)
+		if lexer.peekChar() == '-' {
+			ch := lexer.ch
+			lexer.readChar()
+			tok = token.Token{Type: token.MINUSMINUS, Literal: string(ch) + string(lexer.ch)}
+		} else {
+			tok = newToken(token.MINUS, lexer.ch)
+		}
 	case '!':
 		if lexer.peekChar() == '=' {
 			ch := lexer.ch
