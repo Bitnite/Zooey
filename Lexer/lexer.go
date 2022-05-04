@@ -14,7 +14,7 @@ type Lexer struct {
 	ch       byte   // char
 }
 
-func NewLexer(input string) *Lexer {
+func New(input string) *Lexer {
 	lexer := &Lexer{input: input} //Inicia um novo lexer com a cadeia de char passada
 	lexer.readChar()              //Coloca o cursor na posição do primeiro caracter da cadeia
 

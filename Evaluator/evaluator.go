@@ -130,6 +130,8 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 		result = Eval(statement, env)
 
 		switch result := result.(type) {
+		case *object.Integer:
+			fmt.Println(result.Inspect())
 		case *object.ReturnValue:
 			return result.Value
 		case *object.Error:

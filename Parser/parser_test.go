@@ -15,7 +15,7 @@ func TestParser_x(t *testing.T) {
 		want    []token.Token
 		wantErr bool
 	}
-	l := Lexer.NewLexer(`x := 5; for ( owo i :=: 10; i >= 0; i :=: i - 1) { x := x - 10; }`)
+	l := Lexer.New(`x := 5; for ( owo i :=: 10; i >= 0; i :=: i - 1) { x := x - 10; }`)
 	parser := New(l)
 	program := parser.ParseProgram()
 
